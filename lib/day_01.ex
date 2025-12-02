@@ -6,6 +6,8 @@ defmodule Aoc2025.D01 do
   def parse_instruction(<<?L, val::binary>>), do: String.to_integer(val) * -1
 
   def input() do
+    
+
     File.read!(@input)
     |> String.split("\n", trim: true)
     |> Enum.map(&parse_instruction/1)

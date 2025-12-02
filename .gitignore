@@ -21,9 +21,7 @@ aoc_2025-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+*.t.*
 
 # Input data
-**/*input.txt
-
-# Livebook notebooks
-/notebooks/
+/priv/
