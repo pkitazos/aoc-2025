@@ -2,10 +2,8 @@ defmodule Aoc2025.D01 do
   @input "lib/day_01/input.txt"
   @start 50
 
-  defp to_int(str), do: elem(Integer.parse(str), 0)
-
-  def parse_instruction(<<?R, val::binary>>), do: to_int(val)
-  def parse_instruction(<<?L, val::binary>>), do: to_int(val) * -1
+  def parse_instruction(<<?R, val::binary>>), do: String.to_integer(val)
+  def parse_instruction(<<?L, val::binary>>), do: String.to_integer(val) * -1
 
   def input() do
     File.read!(@input)
