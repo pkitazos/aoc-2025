@@ -1,20 +1,17 @@
-defmodule D01 do
+defmodule Aoc2025.D01 do
   @input "lib/day_01/input.txt"
-  @start 0
+  @start 50
 
   defp to_int(str), do: elem(Integer.parse(str), 0)
 
-  defp parse_input(input) do
-    input
-    |> String.split("\n")
-    |> Enum.reject(&(&1 == ""))
-    |> Enum.map(fn
-      <<"L", rest::binary>> -> -1 * to_int(rest)
-      <<"R", rest::binary>> -> to_int(rest)
-    end)
-  end
+  def parse_instruction(<<?R, val::binary>>), do: to_int(val)
+  def parse_instruction(<<?L, val::binary>>), do: to_int(val) * -1
 
-  defp input, do: File.read!(@input) |> parse_input()
+  def input() do
+    File.read!(@input)
+    |> String.split("\n", trim: true)
+    |> Enum.map(&parse_instruction/1)
+  end
 
   def part1 do
     input()
@@ -26,63 +23,50 @@ defmodule D01 do
     |> then(&elem(&1, 1))
   end
 
-  defp polarity(n) when n == 0, do: :zero
-  defp polarity(n), do: if(abs(n) == n, do: :pos, else: :neg)
+  def part2 do
+    {_, res} =
+      for instruction <- input(), reduce: {@start, 0} do
+        {curr_pos, count} ->
+          new_pos = Integer.mod(curr_pos + instruction, 100)
+          curr_zero = if new_pos == 0, do: 1, else: 0
 
-  def rotation_segments(n), do: {abs(div(n, 100)), rem(n, 100)}
+          clicks =
+            cond do
+              instruction <= 0 ->
+                # we either are not moving or we are moving to the left
 
-  def apply_rotation(curr, incr) do
-    res = curr + incr
-    norm_res = rem(res, 100)
+                # Let's say we were at position 10 and now we're at 5
+                # that's perfectly fine, we could've gotten there by moving -5 or -5 - (100*n)
+                # since 5 itself can be represtented with the above formula
+                # it suffices to count any instances where we move from a larger number to a smaller number
 
-    clicks =
-      case {polarity(curr), polarity(norm_res)} do
-        {pol, :zero} when pol != :zero ->
-          IO.puts("\t\twent from zero: #{curr} to zero: #{norm_res}")
-          1
+                # If we were at position 10 and now we find ourselves at position 80
+                # we know that can only happen by crossing the 0 boundary, so we know we cross at least once
 
-        {:pos, :neg} ->
-          IO.puts("\t\twent from pos: #{curr} to neg: #{norm_res}")
-          1
+                # If however we start at position 0 and now we're at position 20
+                # we didn't actually cross the 0 boundary we just moved away from it
+                # so we need to make sure to not add 1 in this situation
 
-        {:neg, :pos} ->
-          IO.puts("\t\twent from neg: #{curr} to pos: #{norm_res}")
-          1
+                instruction
+                |> abs()
+                |> div(100)
+                |> then(fn n -> if new_pos > curr_pos and curr_pos != 0, do: n + 1, else: n end)
 
-        {:neg, :neg} when res < -100 ->
-          IO.puts("\t\twent from neg: #{curr} to neg: #{norm_res}")
-          1
+              true ->
+                # we are moving to the right
 
-        {:pos, :pos} when res > 100 ->
-          IO.puts("\t\twent from pos: #{curr} to pos: #{norm_res}")
-          1
+                # following the same logic as before
+                instruction
+                |> div(100)
+                |> then(fn n -> if new_pos < curr_pos and new_pos != 0, do: n + 1, else: n end)
+            end
 
-        _ ->
-          IO.puts(
-            "\t\twent from #{polarity(curr)}: #{curr} to #{polarity(norm_res)}: #{norm_res}"
-          )
+          total_this_step =
+            curr_zero + clicks - if(curr_pos == 0 and new_pos == 0, do: 1, else: 0)
 
-          0
+          {new_pos, count + total_this_step}
       end
 
-    {rem(norm_res, 100), clicks}
-  end
-
-  def part2 do
-    # for incr <- [-276], reduce: {-64, 0} do
-    for incr <- input(), reduce: {@start, 0} do
-      {curr_pos, curr_count} ->
-        {full, rem_incr} = rotation_segments(incr)
-        IO.puts("full rotations: #{full}")
-
-        {new_pos, num_clicks} = apply_rotation(curr_pos, rem_incr)
-        IO.puts("clicked #{num_clicks} times going from #{curr_pos} to #{new_pos}")
-
-        new_count = curr_count + full + num_clicks
-
-        IO.puts("#{curr_pos}\t->\t#{new_pos}\tvia\t#{incr}\t\t\t//\t#{new_count}")
-
-        {new_pos, new_count}
-    end
+    res
   end
 end

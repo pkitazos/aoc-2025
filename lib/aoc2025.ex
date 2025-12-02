@@ -14,8 +14,9 @@ defmodule Aoc2025 do
   """
   def run(day) do
     case day do
-      :D01_1 -> D01.part1()
-      :D01_2 -> D01.part2()
+      :D01_1 -> Aoc2025.D01.part1()
+      :D01_2 -> Aoc2025.D01.part2()
+      :D02_1 -> Aoc2025.D01.part1()
       _ -> 0
     end
   end
