@@ -8,20 +8,20 @@ defmodule Aoc.Template do
 
       # @answers %{part1: nil, part2: nil}
 
-      def input(source \\\\ :input) do
-        Input.read(__MODULE__, source)
+      def input(src) do
+        Input.read(__MODULE__, src)
         |> String.trim()
 
         # TODO: Parse input
       end
 
-      def part1 do
-        input()
+      def part1(src \\\\ :input) do
+        input(src)
         # TODO: Implement part 1
       end
 
-      def part2 do
-        input()
+      def part2(src \\\\ :input) do
+        input(src)
         # TODO: Implement part 2
       end
     end

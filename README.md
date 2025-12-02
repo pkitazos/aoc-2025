@@ -1,21 +1,3 @@
-# Aoc2025
+# Advent of Code 2025
 
-**TODO: Add description**
-
-## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `aoc_2025` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:aoc_2025, "~> 0.1.0"}
-  ]
-end
-```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/aoc_2025>.
-
+This is where all my AoC solutions will live for this year. While I don't imagine I'll make it all the way to the end, it's always really fun and this year I'll try to use this as an excuse to play around with Elixir's concurrency a bit more.

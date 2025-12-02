@@ -1,5 +1,14 @@
-defmodule Aoc2025.D02 do
-  @input "lib/day_02/input.txt"
+defmodule Aoc.D02 do
+  alias Aoc.Input
+
+  @answers %{part1: 40_214_376_723, part2: 50_793_864_718}
+
+  def input(src) do
+    Input.read(__MODULE__, src)
+    |> String.trim()
+    |> String.split(",", trim: true)
+    |> Enum.map(&parse_range/1)
+  end
 
   defp parallel_process(input, process_fn) do
     input
@@ -17,13 +26,6 @@ defmodule Aoc2025.D02 do
     first..last
   end
 
-  def input do
-    File.read!(@input)
-    |> String.trim()
-    |> String.split(",", trim: true)
-    |> Enum.map(&parse_range/1)
-  end
-
   defp repeats_twice?(id) do
     mid = div(String.length(id), 2)
     {lhs, rhs} = String.split_at(id, mid)
@@ -38,7 +40,7 @@ defmodule Aoc2025.D02 do
     |> Enum.map(&String.to_integer/1)
   end
 
-  def part1, do: input() |> parallel_process(&process_range/1)
+  def part1(src \\ :input), do: input(src) |> parallel_process(&process_range/1)
 
   defp is_invalid?(id) do
     len = String.length(id)
@@ -64,5 +66,5 @@ defmodule Aoc2025.D02 do
     |> Enum.map(&String.to_integer/1)
   end
 
-  def part2, do: input() |> parallel_process(&process_range2/1)
+  def part2(src \\ :input), do: input(src) |> parallel_process(&process_range2/1)
 end
