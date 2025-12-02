@@ -25,26 +25,10 @@ defmodule Mix.Tasks.Aoc.Run do
       [] ->
         show_usage()
 
-      ["all"] ->
-        CLI.run(:all, opts)
-
       [day_spec] ->
-        parse_day_spec(day_spec, opts)
-    end
-  end
-
-  defp parse_day_spec(spec, opts) do
-    cond do
-      String.contains?(spec, "..") ->
-        [from, to] = String.split(spec, "..")
-        CLI.run(String.to_integer(from)..String.to_integer(to), opts)
-
-      String.contains?(spec, ",") ->
-        days = spec |> String.split(",") |> Enum.map(&String.to_integer/1)
-        CLI.run(days, opts)
-
-      true ->
-        CLI.run(String.to_integer(spec), opts)
+        day_spec
+        |> Aoc.DayParser.parse()
+        |> CLI.run(opts)
     end
   end
 

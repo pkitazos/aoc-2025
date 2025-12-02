@@ -1,23 +1,16 @@
 defmodule Aoc do
   @moduledoc """
-  Documentation for `Aoc`.
+  Advent of Code 2025 solutions.
   """
 
   @doc """
-  Run a specific day
+  Quick helper to run a day from IEx.
 
   ## Examples
 
-      iex> Aoc.run(:day_01)
-      3
-
+      iex> Aoc.run(1)
+      iex> Aoc.run(2, part: 1)
+      iex> Aoc.run(3, example: true)
   """
-  def run(day) do
-    case day do
-      :D01_1 -> Aoc.D01.part1()
-      :D01_2 -> Aoc.D01.part2()
-      :D02_1 -> Aoc.D01.part1()
-      _ -> 0
-    end
-  end
+  defdelegate run(day, opts \\ []), to: Aoc.CLI
 end

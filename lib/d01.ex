@@ -2,6 +2,7 @@ defmodule Aoc.D01 do
   alias Aoc.Input
 
   @answers %{part1: 1141, part2: 6634}
+  def answers, do: @answers
 
   @starting_value 50
 

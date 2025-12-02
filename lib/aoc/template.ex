@@ -7,6 +7,7 @@ defmodule Aoc.Template do
       alias Aoc.Input
 
       # @answers %{part1: nil, part2: nil}
+      # def answers, do: @answers
 
       def input(src) do
         Input.read(__MODULE__, src)
