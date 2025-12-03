@@ -4,7 +4,7 @@ defmodule Aoc.D02 do
   @answers %{part1: 40_214_376_723, part2: 50_793_864_718}
   def answers, do: @answers
 
-  defp input(src) do
+  def input(src) do
     Input.read(__MODULE__, src)
     |> String.trim()
     |> String.split(",", trim: true)
@@ -41,7 +41,7 @@ defmodule Aoc.D02 do
     |> Enum.map(&String.to_integer/1)
   end
 
-  def part1(src \\ :input), do: input(src) |> parallel_process(&process_range/1)
+  def part1(input), do: parallel_process(input, &process_range/1)
 
   defp is_invalid?(id) do
     len = String.length(id)
@@ -67,5 +67,5 @@ defmodule Aoc.D02 do
     |> Enum.map(&String.to_integer/1)
   end
 
-  def part2(src \\ :input), do: input(src) |> parallel_process(&process_range2/1)
+  def part2(input), do: parallel_process(input, &process_range2/1)
 end

@@ -21,8 +21,15 @@ defmodule Aoc.CLI do
 
     input_dir = "priv/inputs/#{String.downcase(module_name)}"
     File.mkdir_p!(input_dir)
+
     File.touch!("#{input_dir}/input.txt")
     File.touch!("#{input_dir}/example.input.txt")
+
+    bench_dir = "priv/benchmarks/#{String.downcase(module_name)}"
+    File.mkdir_p!(bench_dir)
+
+    File.touch!("#{bench_dir}/part_1.json")
+    File.touch!("#{bench_dir}/part_2.json")
 
     if Keyword.get(opts, :fetch, false) do
       fetch_and_save_input(day, input_dir)
@@ -83,13 +90,14 @@ defmodule Aoc.CLI do
 
     if Code.ensure_loaded?(module) do
       function = :"part#{part}"
+      input = apply(module, :input, [source])
 
       if time? do
-        {time_us, result} = :timer.tc(fn -> apply(module, function, [source]) end)
+        {time_us, result} = :timer.tc(fn -> apply(module, function, [input]) end)
         IO.puts("Day #{day}, Part #{part}: #{result} (#{format_time(time_us)})")
         {:ok, result}
       else
-        result = apply(module, function, [source])
+        result = apply(module, function, [input])
         IO.puts("Day #{day}, Part #{part}: #{result}")
         {:ok, result}
       end
@@ -113,9 +121,10 @@ defmodule Aoc.CLI do
 
     if Code.ensure_loaded?(module) do
       answers = module.answers()
+      input = module.input(:input)
 
-      res1 = apply(module, :part1, [:input])
-      res2 = apply(module, :part2, [:input])
+      res1 = apply(module, :part1, [input])
+      res2 = apply(module, :part2, [input])
 
       verify(day, 1, res1, answers.part1)
       verify(day, 2, res2, answers.part2)
@@ -135,5 +144,58 @@ defmodule Aoc.CLI do
       _ ->
         IO.puts("Day #{day}, Part #{part}: #{result} ✗ Expected: #{expected}")
     end
+  end
+
+  def bench(:all, opts), do: discover_days() |> Enum.each(&bench(&1, opts))
+  def bench(%Range{} = range, opts), do: Enum.each(range, &bench(&1, opts))
+  def bench(days, opts) when is_list(days), do: Enum.each(days, &bench(&1, opts))
+
+  def bench(day, opts) when is_integer(day) do
+    part = Keyword.get(opts, :part)
+    source = if Keyword.get(opts, :example, false), do: :example, else: :input
+
+    case part do
+      nil ->
+        bench_part(day, 1, source)
+        bench_part(day, 2, source)
+
+      p when p in [1, 2] ->
+        bench_part(day, p, source)
+
+      _ ->
+        Mix.shell().error("Part must be 1 or 2")
+    end
+  end
+
+  defp bench_part(day, part, source) do
+    module_name = Template.module_name(day)
+    module = Module.concat(Aoc, module_name)
+
+    filepath = "priv/benchmarks/#{String.downcase(module_name)}/part_#{part}.json"
+    File.mkdir_p!(Path.dirname(filepath))
+
+    Owl.Spinner.run(
+      fn ->
+        Benchee.run(
+          %{"Day #{day} Part #{part}" => fn input -> apply(module, :"part#{part}", [input]) end},
+          inputs: %{"Day #{day}" => module.input(source)},
+          formatters: [{Benchee.Formatters.JSON, file: filepath}],
+          print: [benchmarking: false, configuration: false, fast_warning: false]
+        )
+      end,
+      frames: :moon,
+      label: "Benchmarking Day #{day} Part #{part}..."
+    )
+
+    average_us = read_benchmark_average(filepath)
+    Mix.shell().info("Day #{day}, Part #{part}: #{format_time(average_us)}")
+  end
+
+  defp read_benchmark_average(filepath) do
+    filepath
+    |> File.read!()
+    |> Jason.decode!()
+    |> Enum.at(0)
+    |> get_in(["run_time_data", "statistics", "average"])
   end
 end

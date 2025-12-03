@@ -9,15 +9,15 @@ defmodule Aoc.D01 do
   defp parse_instruction(<<?R, val::binary>>), do: String.to_integer(val)
   defp parse_instruction(<<?L, val::binary>>), do: String.to_integer(val) * -1
 
-  defp input(src) do
+  def input(src) do
     Input.read(__MODULE__, src)
     |> String.trim()
     |> String.split("\n", trim: true)
     |> Enum.map(&parse_instruction/1)
   end
 
-  def part1(src \\ :input) do
-    input(src)
+  def part1(input) do
+    input
     |> Enum.reduce({@starting_value, 0}, fn
       val, {old, count} ->
         new = rem(old + val, 100)
@@ -26,9 +26,9 @@ defmodule Aoc.D01 do
     |> then(&elem(&1, 1))
   end
 
-  def part2(src \\ :input) do
+  def part2(input) do
     {_, res} =
-      for instruction <- input(src), reduce: {@starting_value, 0} do
+      for instruction <- input, reduce: {@starting_value, 0} do
         {curr_pos, count} ->
           new_pos = Integer.mod(curr_pos + instruction, 100)
           curr_zero = if new_pos == 0, do: 1, else: 0

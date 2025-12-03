@@ -67,6 +67,28 @@ To store answers, update the `@answers` attribute in your day module:
 @answers %{part1: 12345, part2: 67890}
 ```
 
+### Benchmarking Solutions
+
+```bash
+# Benchmark a specific day (both parts)
+mix aoc.bench 2
+
+# Benchmark a specific part
+mix aoc.bench 2 --part 1
+
+# Benchmark with example input
+mix aoc.bench 2 --example
+
+# Benchmark multiple days
+mix aoc.bench all
+mix aoc.bench 1..5
+mix aoc.bench 1,3,5
+```
+
+The benchmark command uses [Benchee](https://github.com/bencheeorg/benchee) to run proper statistical benchmarking (warmup period, multiple iterations, statistical analysis). Results are displayed in the console and saved as JSON files in `priv/benchmarks/` for later analysis.
+
+**Note:** Benchmarking measures only your solution logic, excluding file I/O, by pre-loading and parsing inputs before timing begins.
+
 ## Project Structure
 
 ```
@@ -82,9 +104,10 @@ To store answers, update the `@answers` attribute in your day module:
 │   │   ├── input.ex                 # Input file handling
 │   │   └── template.ex              # Template generation
 │   └── mix/tasks/
+│       ├── aoc.bench.ex             # Bench command
+│       ├── aoc.check.ex             # Check command
 │       ├── aoc.run.ex               # Run command
-│       ├── aoc.new.ex               # New command
-│       └── aoc.check.ex             # Check command
+│       └── aoc.new.ex               # New command
 ├── test/
 │   ├── d<N>_test.exs                # Example test cases
 │   └── test_helper.exs              # Test runner
@@ -98,5 +121,6 @@ To store answers, update the `@answers` attribute in your day module:
 ## TODOs
 
 - [x] `--fetch` flag for `new` command to automatically get the inputs for a given day
-- [ ] `bench` command for benchmarking solutions
+- [x] `bench` command for benchmarking solutions
 - [ ] improve command argument parsing
+- [ ] when checking or running multiple days `1,2,1,1` should cache results

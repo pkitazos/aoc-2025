@@ -22,7 +22,11 @@ defmodule Aoc.MixProject do
   defp deps do
     [
       {:req, "~> 0.5.0"},
-      {:dotenvy, "~> 0.8.0"}
+      {:dotenvy, "~> 0.8.0"},
+      {:benchee, "~> 1.3"},
+      {:benchee_json, "~> 1.0", only: :dev},
+      {:jason, "~> 1.4"},
+      {:owl, "~> 0.12"}
     ]
   end
 end

@@ -16,13 +16,13 @@ defmodule Aoc.Template do
         # TODO: Parse input
       end
 
-      def part1(src \\\\ :input) do
-        input(src)
+      def part1(input) do
+        input
         # TODO: Implement part 1
       end
 
-      def part2(src \\\\ :input) do
-        input(src)
+      def part2(input) do
+        input
         # TODO: Implement part 2
       end
     end
