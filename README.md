@@ -70,23 +70,29 @@ To store answers, update the `@answers` attribute in your day module:
 ## Project Structure
 
 ```
-lib/
-  d0<N>.ex                # Day <N> solution
-  aoc.ex                  # Main module
-  aoc/
-    cli.ex                # CLI logic
-    day_parser.ex         # Day specification parser
-    input.ex              # Input file handling
-    template.ex           # Template generation
-  mix/tasks/
-    aoc.run.ex            # Run command
-    aoc.new.ex            # New command
-    aoc.check.ex          # Check command
-priv/                     # gitignored
-  inputs/
-    d0<N>/
-      input.txt           # Actual puzzle input
-      example.input.txt   # Example from problem
+.
+├── .env                          # Set your session cookie variable here
+├── lib/
+│   ├── d<N>.ex                   # Day <N> solution
+│   ├── aoc.ex                    # Main module
+│   ├── aoc/
+│   │   ├── cli.ex                # CLI logic
+│   │   ├── day_parser.ex         # Day specification parser
+│   │   ├── fetcher.ex            # Fetch your puzzle input
+│   │   ├── input.ex              # Input file handling
+│   │   └── template.ex           # Template generation
+│   └── mix/tasks/
+│       ├── aoc.run.ex            # Run command
+│       ├── aoc.new.ex            # New command
+│       └── aoc.check.ex          # Check command
+├── test/
+│   ├── d<N>_test.exs             # Example test cases
+│   └── test_helper.exs           # Test runner
+└── priv/                         # gitignored
+    └── inputs/
+        └── d<N>/
+            ├── input.txt         # Actual puzzle input
+            └── example.input.txt # Example puzzle input
 ```
 
 ## TODOs
