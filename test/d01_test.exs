@@ -1,4 +1,4 @@
-defmodule Aoc.Day1Test do
+defmodule Aoc.D01Test do
   use ExUnit.Case, asunc: true
 
   test "day 1 parse instruction" do
