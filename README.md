@@ -36,12 +36,18 @@ mix aoc.new
 
 # Scaffold a specific day
 mix aoc.new 3
+
+# Scaffold and fetch puzzle input from adventofcode.com
+mix aoc.new 3 --fetch
 ```
 
 This creates:
 - `lib/d03.ex` with some basic template code
+- `test/d03_test.exs` with example test stubs (need to be manually updated by you)
 - `priv/inputs/d03/input.txt`
 - `priv/inputs/d03/example.input.txt`
+
+**Note:** The `--fetch` flag requires an `AOC_SESSION` environment variable in your `.env` file. You can get your session cookie from the adventofcode.com website while logged in (browser dev tools > Application > Cookies > `session`).
 
 ### Checking Answers
 
@@ -85,6 +91,6 @@ priv/                     # gitignored
 
 ## TODOs
 
-- [ ] `--fetch` flag for `new` command to automatically get the inputs for a given day
+- [x] `--fetch` flag for `new` command to automatically get the inputs for a given day
 - [ ] `bench` command for benchmarking solutions
 - [ ] improve command argument parsing

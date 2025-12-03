@@ -1,5 +1,5 @@
 defmodule Aoc.D01Test do
-  use ExUnit.Case, asunc: true
+  use ExUnit.Case, async: true
 
   test "day 1 parse instruction" do
     assert Aoc.D01.parse_instruction("R8") == 8
@@ -17,10 +17,10 @@ defmodule Aoc.D01Test do
   end
 
   test "day 1 part 1 example" do
-    assert Aoc.D01.part1() == 3
+    assert Aoc.D01.part1(:example) == 3
   end
 
   test "day 1 part 2 example" do
-    assert Aoc.D01.part2() == 6
+    assert Aoc.D01.part2(:example) == 6
   end
 end

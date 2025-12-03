@@ -1,5 +1,6 @@
 defmodule Mix.Tasks.Aoc.New do
   use Mix.Task
+  alias Aoc.CLI
 
   @shortdoc "Scaffold a new day"
 
@@ -21,15 +22,27 @@ defmodule Mix.Tasks.Aoc.New do
       )
 
     case remaining do
-      [] ->
-        Aoc.CLI.new(opts)
-
-      [day] ->
-        Aoc.CLI.new(String.to_integer(day), opts)
-
-      _ ->
-        # todo: make show_usage function
-        Mix.shell().error("Usage: mix aoc.new [day]")
+      [] -> CLI.new(opts)
+      [day] -> CLI.new(String.to_integer(day), opts)
+      _ -> show_usage()
     end
+  end
+
+  defp show_usage do
+    Mix.shell().info("""
+    Usage: mix aoc.new [day] [options]
+
+    Arguments:
+      [day]        Day number (1-12). If omitted, uses today's date.
+
+    Options:
+      --fetch, -f  Fetch puzzle input from adventofcode.com
+                   Requires AOC_SESSION in .env file
+
+    Examples:
+      mix aoc.new              Create scaffold for today's puzzle
+      mix aoc.new 3            Create scaffold for day 3
+      mix aoc.new 3 --fetch    Create scaffold and fetch input
+    """)
   end
 end

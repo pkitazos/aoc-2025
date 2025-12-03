@@ -33,14 +33,14 @@ defmodule Aoc.Template do
   def day_test(day) do
     ~s"""
     defmodule Aoc.#{module_name(day)}Test do
-      use ExUnit.Case, asunc: true
+      use ExUnit.Case, async: true
 
       test "day #{day} part 1 example" do
-        assert Aoc.#{module_name(day)}.part1() == nil # add part 1 example answer
+        assert Aoc.#{module_name(day)}.part1(:example) == nil # add part 1 example answer
       end
 
       test "day #{day} part 2 example" do
-        assert Aoc.#{module_name(day)}.part2() == nil # add part 2 example answer
+        assert Aoc.#{module_name(day)}.part2(:example) == nil # add part 2 example answer
       end
     end
 
