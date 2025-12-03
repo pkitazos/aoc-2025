@@ -4,7 +4,7 @@ defmodule Aoc.D02 do
   @answers %{part1: 40_214_376_723, part2: 50_793_864_718}
   def answers, do: @answers
 
-  def input(src) do
+  defp input(src) do
     Input.read(__MODULE__, src)
     |> String.trim()
     |> String.split(",", trim: true)
