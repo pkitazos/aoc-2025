@@ -13,9 +13,11 @@ defmodule Aoc.CLI do
 
   def new(day) when is_integer(day) do
     module_name = Template.module_name(day)
-    content = Template.day_module(day)
+    solution_module_content = Template.day_module(day)
+    test_module_content = Template.day_test(day)
 
-    File.write!("lib/#{String.downcase(module_name)}.ex", content)
+    File.write!("lib/#{String.downcase(module_name)}.ex", solution_module_content)
+    File.write!("test/#{String.downcase(module_name)}_test.exs", test_module_content)
 
     input_dir = "priv/inputs/#{String.downcase(module_name)}"
     File.mkdir_p!(input_dir)
