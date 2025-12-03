@@ -1,17 +1,17 @@
 defmodule Aoc.CLI do
   alias Aoc.Template
 
-  def new do
+  def new(opts) do
     today = Date.utc_today()
 
     if today.month == 12 and today.day in 1..12 do
-      new(today.day)
+      new(today.day, opts)
     else
       Mix.shell().info("No active Advent of Code day today (must be December 1-25).")
     end
   end
 
-  def new(day) when is_integer(day) do
+  def new(day, opts) when is_integer(day) do
     module_name = Template.module_name(day)
     solution_module_content = Template.day_module(day)
     test_module_content = Template.day_test(day)
@@ -24,7 +24,24 @@ defmodule Aoc.CLI do
     File.touch!("#{input_dir}/input.txt")
     File.touch!("#{input_dir}/example.input.txt")
 
+    if Keyword.get(opts, :fetch, false) do
+      fetch_and_save_input(day, input_dir)
+    end
+
     Mix.shell().info("Created day #{day}!")
+  end
+
+  defp fetch_and_save_input(day, input_dir) do
+    Mix.shell().info("Fetching input for day #{day}...")
+
+    case Aoc.Fetch.fetch_input(day) do
+      {:ok, input} ->
+        File.write!("#{input_dir}/input.txt", input)
+        Mix.shell().info("✓ Input fetched successfully")
+
+      {:error, reason} ->
+        Mix.shell().error("✗ Failed to fetch input: #{reason}")
+    end
   end
 
   defp discover_days do

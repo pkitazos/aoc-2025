@@ -25,3 +25,6 @@ aoc_2025-*.tar
 
 # Input data
 /priv/
+
+# Environment variables
+.env

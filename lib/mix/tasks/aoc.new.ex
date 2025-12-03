@@ -12,10 +12,24 @@ defmodule Mix.Tasks.Aoc.New do
   """
 
   def run(args) do
-    case args do
-      [] -> Aoc.CLI.new()
-      [day] -> Aoc.CLI.new(String.to_integer(day))
-      _ -> Mix.shell().error("Usage: mix aoc.new [day]")
+    # Need to start the application to ensure all dependencies are loaded
+    Mix.Task.run("app.start")
+
+    {opts, remaining, _} =
+      OptionParser.parse(args,
+        switches: [fetch: :boolean]
+      )
+
+    case remaining do
+      [] ->
+        Aoc.CLI.new(opts)
+
+      [day] ->
+        Aoc.CLI.new(String.to_integer(day), opts)
+
+      _ ->
+        # todo: make show_usage function
+        Mix.shell().error("Usage: mix aoc.new [day]")
     end
   end
 end
