@@ -6,7 +6,6 @@ defmodule Aoc.D04Test do
   end
 
   test "day 4 part 2 example" do
-    # todo: add part 2 example answer
-    assert Aoc.D04.part2(:example) == nil
+    assert Aoc.D04.part2(:example) == 43
   end
 end
