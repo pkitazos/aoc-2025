@@ -106,22 +106,37 @@ defmodule Aoc.CLI do
   defp format_time(us) when us < 1_000_000, do: "#{Float.round(us / 1_000, 2)}ms"
   defp format_time(us), do: "#{Float.round(us / 1_000_000, 2)}s"
 
-  def check(:all), do: discover_days() |> Enum.each(&check/1)
-  def check(%Range{} = range), do: Enum.each(range, &check/1)
-  def check(days) when is_list(days), do: Enum.each(days, &check/1)
+  def check(:all, opts), do: discover_days() |> Enum.each(&check(&1, opts))
+  def check(%Range{} = range, opts), do: Enum.each(range, &check(&1, opts))
+  def check(days, opts) when is_list(days), do: Enum.each(days, &check(&1, opts))
 
-  def check(day) when is_integer(day) do
+  def check(day, opts) when is_integer(day) do
+    part = Keyword.get(opts, :part)
+
+    case part do
+      nil ->
+        check_part(day, 1)
+        check_part(day, 2)
+
+      p when p in [1, 2] ->
+        check_part(day, p)
+
+      _ ->
+        Mix.shell().error("Part must be 1 or 2")
+    end
+  end
+
+  def check_part(day, part) do
     module = Module.concat(Aoc, Template.module_name(day))
+    part_id = :"part#{part}"
 
     if Code.ensure_loaded?(module) do
       answers = module.answers()
       input = module.input(:input)
 
-      res1 = apply(module, :part1, [input])
-      res2 = apply(module, :part2, [input])
+      res = apply(module, part_id, [input])
 
-      verify(day, 1, res1, answers.part1)
-      verify(day, 2, res2, answers.part2)
+      verify(day, part, res, answers[part_id])
     else
       Mix.shell().error("Day #{day} not found")
     end
