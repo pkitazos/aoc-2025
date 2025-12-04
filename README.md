@@ -55,6 +55,9 @@ This creates:
 # Verify stored answers for a day
 mix aoc.check 2
 
+# Verify stored answers for a specific part
+mix aoc.check 2 --part 1
+
 # Check multiple days
 mix aoc.check all
 mix aoc.check 1..5
@@ -85,7 +88,7 @@ mix aoc.bench 1..5
 mix aoc.bench 1,3,5
 ```
 
-The benchmark command uses [Benchee](https://github.com/bencheeorg/benchee) to run proper statistical benchmarking (warmup period, multiple iterations, statistical analysis). Results are displayed in the console and saved as JSON files in `priv/benchmarks/` for later analysis.
+The benchmark command uses [Benchee](https://github.com/bencheeorg/benchee) to run proper statistical benchmarking (warmup period, multiple iterations, statistical analysis).
 
 **Note:** Benchmarking measures only your solution logic, excluding file I/O, by pre-loading and parsing inputs before timing begins.
 
@@ -120,7 +123,6 @@ The benchmark command uses [Benchee](https://github.com/bencheeorg/benchee) to r
 
 ## TODOs
 
-- [x] `--fetch` flag for `new` command to automatically get the inputs for a given day
-- [x] `bench` command for benchmarking solutions
 - [ ] improve command argument parsing
-- [ ] when checking or running multiple days `1,2,1,1` should cache results
+- [ ] `bench` - fix display of statistical analysis
+- [ ] `run` | `check` - when checking or running multiple days `1,2,1,1` should cache results
