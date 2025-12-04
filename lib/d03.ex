@@ -2,7 +2,8 @@ defmodule Aoc.D03 do
   alias Aoc.Input
 
   @answers %{part1: 17095, part2: 168_794_698_570_517}
-  def answers, do: @answers
+  def answer(1), do: @answers.part1
+  def answer(2), do: @answers.part2
 
   defp parse_bank_digits(bank) do
     bank

@@ -101,7 +101,9 @@ The benchmark command uses [Benchee](https://github.com/bencheeorg/benchee) to r
 │   ├── d<N>.ex                      # Day <N> solution
 │   ├── aoc.ex                       # Main module
 │   ├── aoc/
-│   │   ├── cli.ex                   # CLI logic
+│   │   ├── cli/
+│   │   │   └── command.ex           # Command dispatch and helpers
+│   │   ├── cli.ex                   # CLI command implementations
 │   │   ├── day_parser.ex            # Day specification parser
 │   │   ├── fetch.ex                 # Fetch your puzzle input
 │   │   ├── input.ex                 # Input file handling

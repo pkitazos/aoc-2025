@@ -2,7 +2,8 @@ defmodule Aoc.D04 do
   alias Aoc.Input
 
   @answers %{part1: 1551, part2: 9784}
-  def answers, do: @answers
+  def answer(1), do: @answers.part1
+  def answer(2), do: @answers.part2
 
   def input(src) do
     rows =

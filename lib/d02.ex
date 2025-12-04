@@ -2,7 +2,8 @@ defmodule Aoc.D02 do
   alias Aoc.Input
 
   @answers %{part1: 40_214_376_723, part2: 50_793_864_718}
-  def answers, do: @answers
+  def answer(1), do: @answers.part1
+  def answer(2), do: @answers.part2
 
   def input(src) do
     Input.read(__MODULE__, src)

@@ -1,5 +1,6 @@
 defmodule Aoc.CLI do
   alias Aoc.Template
+  alias Aoc.CLI.Command
 
   def new(opts) do
     today = Date.utc_today()
@@ -45,170 +46,89 @@ defmodule Aoc.CLI do
     end
   end
 
-  defp discover_days do
-    Mix.Task.run("compile")
+  def run(target, opts), do: Command.dispatch(&run_day/2, target, opts)
 
-    1..12
-    |> Enum.filter(fn day ->
-      module = Module.concat(Aoc, Template.module_name(day))
-      Code.ensure_loaded?(module)
-    end)
-  end
-
-  def run(:all, opts), do: discover_days() |> Enum.each(&run(&1, opts))
-
-  def(run(%Range{} = range, opts), do: Enum.each(range, &run(&1, opts)))
-
-  def run(days, opts) when is_list(days), do: Enum.each(days, &run(&1, opts))
-
-  def run(day, opts) when is_integer(day) do
-    part = Keyword.get(opts, :part)
+  defp run_day(day, opts) do
     time? = Keyword.get(opts, :time, false)
     source = if Keyword.get(opts, :example, false), do: :example, else: :input
 
-    case part do
-      nil ->
-        run_part(day, 1, source, time?)
-        run_part(day, 2, source, time?)
+    Command.with_parts(day, opts, fn day, part, _opts ->
+      Command.with_module(day, fn module ->
+        input = module.input(source)
 
-      p when p in [1, 2] ->
-        run_part(day, p, source, time?)
+        {time_us, result} = :timer.tc(fn -> Command.call_part(module, part, input) end)
 
-      _ ->
-        Mix.shell().error("Part must be 1 or 2")
-    end
-  end
+        if time? do
+          IO.puts("Day #{day}, Part #{part}: #{result} (#{format_time(time_us)})")
+        else
+          IO.puts("Day #{day}, Part #{part}: #{result}")
+        end
 
-  defp run_part(day, part, source, time?) do
-    module = Module.concat(Aoc, Template.module_name(day))
-
-    if Code.ensure_loaded?(module) do
-      function = :"part#{part}"
-      input = apply(module, :input, [source])
-
-      if time? do
-        {time_us, result} = :timer.tc(fn -> apply(module, function, [input]) end)
-        IO.puts("Day #{day}, Part #{part}: #{result} (#{format_time(time_us)})")
         {:ok, result}
-      else
-        result = apply(module, function, [input])
-        IO.puts("Day #{day}, Part #{part}: #{result}")
-        {:ok, result}
-      end
-    else
-      err = "Day #{day} module not found"
-      Mix.shell().error(err)
-      {:error, err}
-    end
+      end)
+    end)
   end
 
   defp format_time(us) when us < 1_000, do: "#{us}μs"
   defp format_time(us) when us < 1_000_000, do: "#{Float.round(us / 1_000, 2)}ms"
   defp format_time(us), do: "#{Float.round(us / 1_000_000, 2)}s"
 
-  def check(:all, opts), do: discover_days() |> Enum.each(&check(&1, opts))
-  def check(%Range{} = range, opts), do: Enum.each(range, &check(&1, opts))
-  def check(days, opts) when is_list(days), do: Enum.each(days, &check(&1, opts))
+  def check(target, opts), do: Command.dispatch(&check_day/2, target, opts)
 
-  def check(day, opts) when is_integer(day) do
-    part = Keyword.get(opts, :part)
+  defp check_day(day, opts) do
+    Command.with_parts(day, opts, fn day, part, _opts ->
+      Command.with_module(day, fn module ->
+        input = module.input(:input)
+        result = Command.call_part(module, part, input)
+        expected = module.answer(part)
 
-    case part do
-      nil ->
-        check_part(day, 1)
-        check_part(day, 2)
-
-      p when p in [1, 2] ->
-        check_part(day, p)
-
-      _ ->
-        Mix.shell().error("Part must be 1 or 2")
-    end
+        case expected do
+          nil -> IO.puts("Day #{day}, Part #{part}: #{result} (no answer stored)")
+          ^result -> IO.puts("Day #{day}, Part #{part}: #{result} ✓")
+          _ -> IO.puts("Day #{day}, Part #{part}: #{result} ✗ Expected: #{expected}")
+        end
+      end)
+    end)
   end
 
-  def check_part(day, part) do
-    module = Module.concat(Aoc, Template.module_name(day))
-    part_id = :"part#{part}"
+  def bench(target, opts), do: Command.dispatch(&bench_day/2, target, opts)
 
-    if Code.ensure_loaded?(module) do
-      answers = module.answers()
-      input = module.input(:input)
-
-      res = apply(module, part_id, [input])
-
-      verify(day, part, res, answers[part_id])
-    else
-      Mix.shell().error("Day #{day} not found")
-    end
-  end
-
-  defp verify(day, part, result, expected) do
-    case expected do
-      nil ->
-        IO.puts("Day #{day}, Part #{part}: #{result} (no answer stored)")
-
-      ^result ->
-        IO.puts("Day #{day}, Part #{part}: #{result} ✓")
-
-      _ ->
-        IO.puts("Day #{day}, Part #{part}: #{result} ✗ Expected: #{expected}")
-    end
-  end
-
-  def bench(:all, opts), do: discover_days() |> Enum.each(&bench(&1, opts))
-  def bench(%Range{} = range, opts), do: Enum.each(range, &bench(&1, opts))
-  def bench(days, opts) when is_list(days), do: Enum.each(days, &bench(&1, opts))
-
-  def bench(day, opts) when is_integer(day) do
-    part = Keyword.get(opts, :part)
+  defp bench_day(day, opts) do
     source = if Keyword.get(opts, :example, false), do: :example, else: :input
 
-    case part do
-      nil ->
-        bench_part(day, 1, source)
-        bench_part(day, 2, source)
+    Command.with_parts(day, opts, fn day, part, _opts ->
+      Command.with_module(day, fn module ->
+        {:ok, suite} =
+          Owl.Spinner.run(
+            fn ->
+              result =
+                Benchee.run(
+                  %{
+                    "Day #{day} Part #{part}" => fn input ->
+                      apply(module, :"part#{part}", [input])
+                    end
+                  },
+                  inputs: %{"Day #{day}" => module.input(source)},
+                  print: [benchmarking: false, configuration: false, fast_warning: false],
+                  formatters: []
+                )
 
-      p when p in [1, 2] ->
-        bench_part(day, p, source)
+              {:ok, result}
+            end,
+            labels: [processing: "Benchmarking Day #{day} Part #{part}..."]
+          )
 
-      _ ->
-        Mix.shell().error("Part must be 1 or 2")
-    end
-  end
+        average_ns =
+          suite.scenarios
+          |> List.first()
+          |> Map.get(:run_time_data)
+          |> Map.get(:statistics)
+          |> Map.get(:average)
 
-  defp bench_part(day, part, source) do
-    module_name = Template.module_name(day)
-    module = Module.concat(Aoc, module_name)
+        average_us = average_ns / 1_000
 
-    {:ok, suite} =
-      Owl.Spinner.run(
-        fn ->
-          result =
-            Benchee.run(
-              %{
-                "Day #{day} Part #{part}" => fn input ->
-                  apply(module, :"part#{part}", [input])
-                end
-              },
-              inputs: %{"Day #{day}" => module.input(source)},
-              print: [benchmarking: false, configuration: false, fast_warning: false],
-              formatters: []
-            )
-
-          {:ok, result}
-        end,
-        labels: [processing: "Benchmarking Day #{day} Part #{part}..."]
-      )
-
-    average_ns =
-      suite.scenarios
-      |> List.first()
-      |> Map.get(:run_time_data)
-      |> Map.get(:statistics)
-      |> Map.get(:average)
-
-    average_us = average_ns / 1_000
-
-    Mix.shell().info("Day #{day}, Part #{part}: #{format_time(average_us)}")
+        Mix.shell().info("Day #{day}, Part #{part}: #{format_time(average_us)}")
+      end)
+    end)
   end
 end
