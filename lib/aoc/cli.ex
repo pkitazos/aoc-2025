@@ -25,12 +25,6 @@ defmodule Aoc.CLI do
     File.touch!("#{input_dir}/input.txt")
     File.touch!("#{input_dir}/example.input.txt")
 
-    bench_dir = "priv/benchmarks/#{String.downcase(module_name)}"
-    File.mkdir_p!(bench_dir)
-
-    File.touch!("#{bench_dir}/part_1.json")
-    File.touch!("#{bench_dir}/part_2.json")
-
     if Keyword.get(opts, :fetch, false) do
       fetch_and_save_input(day, input_dir)
     end
@@ -171,31 +165,35 @@ defmodule Aoc.CLI do
     module_name = Template.module_name(day)
     module = Module.concat(Aoc, module_name)
 
-    filepath = "priv/benchmarks/#{String.downcase(module_name)}/part_#{part}.json"
-    File.mkdir_p!(Path.dirname(filepath))
+    {:ok, suite} =
+      Owl.Spinner.run(
+        fn ->
+          result =
+            Benchee.run(
+              %{
+                "Day #{day} Part #{part}" => fn input ->
+                  apply(module, :"part#{part}", [input])
+                end
+              },
+              inputs: %{"Day #{day}" => module.input(source)},
+              print: [benchmarking: false, configuration: false, fast_warning: false],
+              formatters: []
+            )
 
-    Owl.Spinner.run(
-      fn ->
-        Benchee.run(
-          %{"Day #{day} Part #{part}" => fn input -> apply(module, :"part#{part}", [input]) end},
-          inputs: %{"Day #{day}" => module.input(source)},
-          formatters: [{Benchee.Formatters.JSON, file: filepath}],
-          print: [benchmarking: false, configuration: false, fast_warning: false]
-        )
-      end,
-      frames: :moon,
-      label: "Benchmarking Day #{day} Part #{part}..."
-    )
+          {:ok, result}
+        end,
+        labels: [processing: "Benchmarking Day #{day} Part #{part}..."]
+      )
 
-    average_us = read_benchmark_average(filepath)
+    average_ns =
+      suite.scenarios
+      |> List.first()
+      |> Map.get(:run_time_data)
+      |> Map.get(:statistics)
+      |> Map.get(:average)
+
+    average_us = average_ns / 1_000
+
     Mix.shell().info("Day #{day}, Part #{part}: #{format_time(average_us)}")
-  end
-
-  defp read_benchmark_average(filepath) do
-    filepath
-    |> File.read!()
-    |> Jason.decode!()
-    |> Enum.at(0)
-    |> get_in(["run_time_data", "statistics", "average"])
   end
 end

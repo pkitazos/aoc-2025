@@ -36,11 +36,13 @@ defmodule Aoc.Template do
       use ExUnit.Case, async: true
 
       test "day #{day} part 1 example" do
-        assert Aoc.#{module_name(day)}.part1(:example) == nil # add part 1 example answer
+        # todo: add part 1 example answer
+        assert Aoc.#{module_name(day)}.part1(:example) == nil
       end
 
       test "day #{day} part 2 example" do
-        assert Aoc.#{module_name(day)}.part2(:example) == nil # add part 2 example answer
+        # todo: add part 2 example answer
+        assert Aoc.#{module_name(day)}.part2(:example) == nil
       end
     end
 
