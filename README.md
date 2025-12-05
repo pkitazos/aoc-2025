@@ -128,3 +128,4 @@ The benchmark command uses [Benchee](https://github.com/bencheeorg/benchee) to r
 - [ ] improve command argument parsing
 - [ ] `bench` - fix display of statistical analysis
 - [ ] `run` | `check` - when checking or running multiple days `1,2,1,1` should cache results
+- [ ] `check` function should print warning if the expected value is nil. Something like "Did you forget to set the answer?"
