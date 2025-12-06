@@ -54,7 +54,7 @@ defmodule Aoc.CLI do
 
     Command.with_parts(day, opts, fn day, part, _opts ->
       Command.with_module(day, fn module ->
-        input = module.input(source)
+        input = module.input(source, part)
 
         {time_us, result} = :timer.tc(fn -> Command.call_part(module, part, input) end)
 
@@ -78,7 +78,7 @@ defmodule Aoc.CLI do
   defp check_day(day, opts) do
     Command.with_parts(day, opts, fn day, part, _opts ->
       Command.with_module(day, fn module ->
-        input = module.input(:input)
+        input = module.input(:input, part)
         result = Command.call_part(module, part, input)
         expected = module.answer(part)
 
@@ -108,7 +108,7 @@ defmodule Aoc.CLI do
                       apply(module, :"part#{part}", [input])
                     end
                   },
-                  inputs: %{"Day #{day}" => module.input(source)},
+                  inputs: %{"Day #{day}" => module.input(source, part)},
                   print: [benchmarking: false, configuration: false, fast_warning: false],
                   formatters: []
                 )

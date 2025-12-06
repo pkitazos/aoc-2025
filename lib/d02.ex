@@ -5,7 +5,7 @@ defmodule Aoc.D02 do
   def answer(1), do: @answers.part1
   def answer(2), do: @answers.part2
 
-  def input(src) do
+  def input(src, _part \\ nil) do
     Input.read(__MODULE__, src)
     |> String.trim()
     |> String.split(",", trim: true)
@@ -60,6 +60,7 @@ defmodule Aoc.D02 do
     |> Enum.reject(&(String.length(&1) == 1))
     |> Enum.filter(&is_invalid?/1)
     |> Enum.map(&String.to_integer/1)
+    |> Enum.sum()
   end
 
   def part2(input), do: Utils.parallel_process(input, &process_range2/1)

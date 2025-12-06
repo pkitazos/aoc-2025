@@ -11,7 +11,7 @@ defmodule Aoc.D03 do
     |> Enum.map(&String.to_integer/1)
   end
 
-  def input(src) do
+  def input(src, _part \\ nil) do
     Input.read(__MODULE__, src)
     |> String.trim()
     |> String.split("\n", trim: true)

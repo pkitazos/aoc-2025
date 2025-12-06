@@ -10,7 +10,7 @@ defmodule Aoc.D01 do
   defp parse_instruction(<<?R, val::binary>>), do: String.to_integer(val)
   defp parse_instruction(<<?L, val::binary>>), do: String.to_integer(val) * -1
 
-  def input(src) do
+  def input(src, _part \\ nil) do
     Input.read(__MODULE__, src)
     |> String.trim()
     |> String.split("\n", trim: true)
