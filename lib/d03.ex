@@ -1,5 +1,5 @@
 defmodule Aoc.D03 do
-  alias Aoc.Input
+  alias Aoc.{Input, Utils}
 
   @answers %{part1: 17095, part2: 168_794_698_570_517}
   def answer(1), do: @answers.part1
@@ -35,13 +35,6 @@ defmodule Aoc.D03 do
     {max_val, second_max_val}
   end
 
-  defp parallel_process(input, process_fn) do
-    input
-    |> Task.async_stream(process_fn, max_concurrency: System.schedulers_online())
-    |> Enum.map(fn {:ok, results} -> results end)
-    |> Enum.sum()
-  end
-
   defp process_bank(bank) do
     bank
     |> find_max_two_in_sequence()
@@ -49,7 +42,7 @@ defmodule Aoc.D03 do
   end
 
   # Original part 1 implementation
-  def part1_old(input), do: input |> parallel_process(&process_bank/1)
+  def part1_old(input), do: input |> Utils.parallel_process(&process_bank/1)
 
   defp max_in_range(slice, range) do
     slice
@@ -77,7 +70,7 @@ defmodule Aoc.D03 do
   end
 
   # Part 1 is just Part 2 with N=2
-  def part1(input), do: parallel_process(input, &find_max_n_in_sequence(&1, 2))
+  def part1(input), do: Utils.parallel_process(input, &find_max_n_in_sequence(&1, 2))
 
-  def part2(input), do: parallel_process(input, &find_max_n_in_sequence(&1, 12))
+  def part2(input), do: Utils.parallel_process(input, &find_max_n_in_sequence(&1, 12))
 end

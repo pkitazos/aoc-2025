@@ -1,5 +1,5 @@
 defmodule Aoc.D06 do
-  alias Aoc.Input
+  alias Aoc.{Input, Utils}
 
   @answers %{part1: 5_667_835_681_547, part2: 9_434_900_032_651}
   def answer(1), do: @answers.part1
@@ -20,12 +20,10 @@ defmodule Aoc.D06 do
     {op, vals}
   end
 
-  defp transpose(arr), do: Enum.zip_with(arr, &Function.identity/1)
-
   def parse_input_for_part1(input) do
     input
     |> Enum.map(&String.split/1)
-    |> transpose()
+    |> Utils.transpose()
     |> Enum.map(&parse_row/1)
   end
 
@@ -39,13 +37,13 @@ defmodule Aoc.D06 do
   defp parse_chunk(chunk) do
     [op_row | val_rows] =
       chunk
-      |> transpose()
+      |> Utils.transpose()
       |> Enum.reverse()
 
     vals =
       val_rows
       |> Enum.reverse()
-      |> transpose()
+      |> Utils.transpose()
       |> Enum.map(&parse_digits/1)
 
     op =
@@ -78,7 +76,7 @@ defmodule Aoc.D06 do
     input
     |> Enum.map(&String.pad_trailing(&1, max_pad, " "))
     |> Enum.map(&String.graphemes/1)
-    |> transpose()
+    |> Utils.transpose()
     |> Enum.chunk_while([], chunk_fun, after_fun)
     |> Enum.map(&parse_chunk/1)
   end
@@ -95,14 +93,7 @@ defmodule Aoc.D06 do
 
   defp process_row({op, vals}), do: Enum.reduce(vals, &op(op, &1, &2))
 
-  defp parallel_process(input, process_fn) do
-    input
-    |> Task.async_stream(process_fn, max_concurrency: System.schedulers_online())
-    |> Enum.map(fn {:ok, results} -> results end)
-    |> Enum.sum()
-  end
+  def part1(input), do: input |> Utils.parallel_process(&process_row/1)
 
-  def part1(input), do: input |> parallel_process(&process_row/1)
-
-  def part2(input), do: input |> parallel_process(&process_row/1)
+  def part2(input), do: input |> Utils.parallel_process(&process_row/1)
 end

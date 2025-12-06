@@ -1,5 +1,5 @@
 defmodule Aoc.D02 do
-  alias Aoc.Input
+  alias Aoc.{Input, Utils}
 
   @answers %{part1: 40_214_376_723, part2: 50_793_864_718}
   def answer(1), do: @answers.part1
@@ -10,13 +10,6 @@ defmodule Aoc.D02 do
     |> String.trim()
     |> String.split(",", trim: true)
     |> Enum.map(&parse_range/1)
-  end
-
-  defp parallel_process(input, process_fn) do
-    input
-    |> Task.async_stream(process_fn, max_concurrency: System.schedulers_online())
-    |> Enum.flat_map(fn {:ok, results} -> results end)
-    |> Enum.sum()
   end
 
   defp parse_range(range) do
@@ -40,9 +33,10 @@ defmodule Aoc.D02 do
     |> Enum.filter(fn id -> rem(String.length(id), 2) == 0 end)
     |> Enum.filter(&repeats_twice?/1)
     |> Enum.map(&String.to_integer/1)
+    |> Enum.sum()
   end
 
-  def part1(input), do: parallel_process(input, &process_range/1)
+  def part1(input), do: Utils.parallel_process(input, &process_range/1)
 
   defp is_invalid?(id) do
     len = String.length(id)
@@ -68,5 +62,5 @@ defmodule Aoc.D02 do
     |> Enum.map(&String.to_integer/1)
   end
 
-  def part2(input), do: parallel_process(input, &process_range2/1)
+  def part2(input), do: Utils.parallel_process(input, &process_range2/1)
 end
