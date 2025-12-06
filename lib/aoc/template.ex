@@ -6,11 +6,11 @@ defmodule Aoc.Template do
     defmodule Aoc.#{module_name(day)} do
       alias Aoc.Input
 
-      # @answers %{part1: nil, part2: nil}
-      # def answer(1), do: @answers.part1
-      # def answer(2), do: @answers.part2
+      @answers %{part1: nil, part2: nil}
+      def answer(1), do: @answers.part1
+      def answer(2), do: @answers.part2
 
-      def input(src) do
+      def input(src, _part \\\\ nil) do
         Input.read(__MODULE__, src)
         |> String.trim()
 

@@ -5,7 +5,7 @@ defmodule Aoc.D04 do
   def answer(1), do: @answers.part1
   def answer(2), do: @answers.part2
 
-  def input(src) do
+  def input(src, _part \\ nil) do
     rows =
       Input.read(__MODULE__, src)
       |> String.trim()

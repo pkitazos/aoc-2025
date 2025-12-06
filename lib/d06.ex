@@ -81,11 +81,14 @@ defmodule Aoc.D06 do
     |> Enum.map(&parse_chunk/1)
   end
 
-  def input(src) do
+  defp parse_input(input, 1), do: parse_input_for_part1(input)
+  defp parse_input(input, 2), do: parse_input_for_part2(input)
+
+  def input(src, part) do
     Input.read(__MODULE__, src)
     |> String.trim()
     |> String.split("\n", trim: true)
-    |> parse_input_for_part2()
+    |> parse_input(part)
   end
 
   defp op(:*, a, b), do: a * b
